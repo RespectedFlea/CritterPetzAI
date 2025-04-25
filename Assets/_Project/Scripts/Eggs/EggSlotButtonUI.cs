@@ -12,9 +12,15 @@ public class EggSlotButtonUI : MonoBehaviour
 
     void OnClick()
     {
-        if (RoomManager.Instance != null)
+        if (RoomManager.Instance.IsSlotReadyToHatch(slotIndex))
         {
-            RoomManager.Instance.AttemptHatch(slotIndex);
+            RoomManager.Instance.TryHatch(slotIndex);
         }
+        else
+        {
+            RoomEggSelector.Instance.OpenPanelByIndex(slotIndex);
+        }
+
+        Debug.Log($"Clicked Egg Slot: {slotIndex}");
     }
 }

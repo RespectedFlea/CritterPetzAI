@@ -123,7 +123,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 2135765822494153334}
         m_TargetAssemblyTypeName: EggButtonUI, Assembly-CSharp
         m_MethodName: OnClick
         m_Mode: 1
