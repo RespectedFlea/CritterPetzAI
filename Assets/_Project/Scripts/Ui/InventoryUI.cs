@@ -21,42 +21,41 @@ public class InventoryUI : MonoBehaviour
     {
         Debug.Log("Refreshing Inventory...");
 
-        if (buttonPrefab == null)
+        if (buttonPrefab == null || buttonContainer == null || inventoryPanel == null)
         {
-            Debug.LogError("[InventoryUI] buttonPrefab is NOT assigned!");
+            Debug.LogError("[InventoryUI] Missing references!");
             return;
         }
 
-        if (buttonContainer == null)
-        {
-            Debug.LogError("[InventoryUI] buttonContainer is NOT assigned!");
-            return;
-        }
-
-        if (inventoryPanel == null)
-        {
-            Debug.LogError("[InventoryUI] inventoryPanel is NOT assigned!");
-            return;
-        }
-
-        // Clear old buttons
         foreach (Transform child in buttonContainer)
         {
             Destroy(child.gameObject);
         }
 
-        // Get eggs
-        List<EggData> eggs = InventoryManager.Instance.GetAllEggs();
-
-        // Generate buttons
-        foreach (EggData egg in eggs)
+        // Group eggs by type
+        Dictionary<EggData, int> eggCounts = new Dictionary<EggData, int>();
+        foreach (EggData egg in InventoryManager.Instance.GetAllEggs())
         {
+            if (eggCounts.ContainsKey(egg))
+                eggCounts[egg]++;
+            else
+                eggCounts[egg] = 1;
+        }
+
+        // Display each group with count
+        foreach (KeyValuePair<EggData, int> pair in eggCounts)
+        {
+            EggData egg = pair.Key;
+            int count = pair.Value;
+
             GameObject newButton = Instantiate(buttonPrefab, buttonContainer);
 
-            var text = newButton.GetComponentInChildren<TMPro.TextMeshProUGUI>();
+            // Update name with count
+            var text = newButton.GetComponentInChildren<TextMeshProUGUI>();
             if (text != null)
-                text.text = egg.eggName;
+                text.text = $"{egg.eggName} x{count}";
 
+            // Update icon
             var images = newButton.GetComponentsInChildren<Image>();
             foreach (Image img in images)
             {

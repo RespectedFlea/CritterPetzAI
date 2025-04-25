@@ -25,16 +25,10 @@ public class InventoryManager : MonoBehaviour
     // Adds an egg to the inventory
     public void AddEgg(EggData eggData)
     {
-        if (!eggInventory.Contains(eggData))
-        {
-            eggInventory.Add(eggData);
-            Debug.Log($"Added egg: {eggData.eggName}");
-        }
-        else
-        {
-            Debug.Log($"Egg already in inventory: {eggData.eggName}");
-        }
+        eggInventory.Add(eggData);
+        Debug.Log($"Added egg: {eggData.eggName}");
     }
+
 
     // Removes an egg from the inventory
     public void RemoveEgg(EggData eggData)
