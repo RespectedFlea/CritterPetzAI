@@ -16,9 +16,4 @@ public class GameManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(this.gameObject);
     }
-
-    void Start()
-    {
-        // Initialize game systems here later
-    }
 }

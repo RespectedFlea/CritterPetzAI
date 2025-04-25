@@ -10,9 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6069265858491074c87f34e8c13ebbb7, type: 3}
-  m_Name: Dog Egg
+  m_Name: Cat Egg
   m_EditorClassIdentifier: 
-  eggName: Dog Egg
-  eggType: 2
-  eggSprite: {fileID: 6913012632153620298, guid: 4931ee3f7ba5e6743935cf3efc960b1f, type: 3}
-  description: An egg full of puppy love!
+  eggName: Cat Egg
+  eggSprite: {fileID: 6106100700041757347, guid: 4931ee3f7ba5e6743935cf3efc960b1f, type: 3}
+  hatchDuration: 10

@@ -6,8 +6,8 @@ public class InventoryManager : MonoBehaviour
 {
     public static InventoryManager Instance;
 
-    // List of all EggData the player owns
-    public List<EggData> eggInventory = new List<EggData>();
+    // Simplified initialization of the list
+    public List<EggData> eggInventory = new();
 
     void Awake()
     {

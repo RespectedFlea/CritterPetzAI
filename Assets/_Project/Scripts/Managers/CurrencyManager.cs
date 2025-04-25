@@ -16,9 +16,4 @@ public class CurrencyManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(this.gameObject);
     }
-
-    void Start()
-    {
-        // Initialize game systems here later
-    }
 }

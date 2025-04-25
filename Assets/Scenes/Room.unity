@@ -3684,7 +3684,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0967662000a794b45a9baef7329888ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  eggInventory: []
+  eggInventory:
+  - {fileID: 11400000, guid: 8c602abfb23ca2d4f8a991437d98b27d, type: 2}
+  - {fileID: 11400000, guid: 8c602abfb23ca2d4f8a991437d98b27d, type: 2}
+  - {fileID: 11400000, guid: de4a2cb72d6502e47b165c84a1d06347, type: 2}
 --- !u!4 &1872441010
 Transform:
   m_ObjectHideFlags: 0
@@ -3732,7 +3735,6 @@ MonoBehaviour:
   - {fileID: 1043476158}
   - {fileID: 1880046169}
   - {fileID: 1908252404}
-  hatchDuration: 10
   defaultEmptySlotSprite: {fileID: 10917, guid: 0000000000000000f000000000000000, type: 0}
 --- !u!114 &1872441013
 MonoBehaviour:

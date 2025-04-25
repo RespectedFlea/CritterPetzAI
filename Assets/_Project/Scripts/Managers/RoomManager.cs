@@ -12,10 +12,10 @@ public class RoomManager : MonoBehaviour
     public Image[] eggSlotIcons;
 
     [Header("Hatch Settings")]
-    public float hatchDuration = 30f;
-    private float[] hatchTimers = new float[3];
-    private bool[] isHatching = new bool[3];
-    private bool[] isReadyToHatch = new bool[3];
+    public readonly float hatchDuration = 30f;
+    private readonly float[] hatchTimers = new float[3];
+    private readonly bool[] isHatching = new bool[3];
+    private readonly bool[] isReadyToHatch = new bool[3];
 
     public Sprite defaultEmptySlotSprite;
 
@@ -79,7 +79,8 @@ public class RoomManager : MonoBehaviour
             if (label != null)
                 label.text = $"{Mathf.CeilToInt(hatchDuration)}s";
 
-            StartHatchTimer(index);
+            StartHatchTimer(index, egg.hatchDuration);
+
         }
         else
         {
@@ -88,12 +89,13 @@ public class RoomManager : MonoBehaviour
     }
 
 
-    void StartHatchTimer(int index)
+    void StartHatchTimer(int index, float duration)
     {
-        hatchTimers[index] = hatchDuration;
+        hatchTimers[index] = duration;
         isHatching[index] = true;
         isReadyToHatch[index] = false;
     }
+
 
     public void TryHatch(int index)
     {

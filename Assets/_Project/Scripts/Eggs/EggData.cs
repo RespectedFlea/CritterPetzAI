@@ -2,13 +2,11 @@ using UnityEngine;
 
 namespace CritterPetz
 {
-    [CreateAssetMenu(fileName = "NewEggData", menuName = "CritterPetz/Egg Data")]
+    [CreateAssetMenu(fileName = "NewEgg", menuName = "CritterPetz/Egg")]
     public class EggData : ScriptableObject
     {
         public string eggName;
-        public EggType eggType;
         public Sprite eggSprite;
-        [TextArea]
-        public string description;
+        public float hatchDuration = 30f;
     }
 }

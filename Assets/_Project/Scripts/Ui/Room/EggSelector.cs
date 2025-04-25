@@ -53,32 +53,37 @@ public class RoomEggSelector : MonoBehaviour
     void PopulateEggButtons()
     {
         foreach (Transform child in eggGrid)
-            Destroy(child.gameObject);
-
-        Dictionary<EggData, int> grouped = new Dictionary<EggData, int>();
-        foreach (EggData egg in InventoryManager.Instance.GetAllEggs())
         {
-            if (grouped.ContainsKey(egg)) grouped[egg]++;
-            else grouped[egg] = 1;
+            Destroy(child.gameObject);
+        }
+
+        var grouped = new Dictionary<EggData, int>();
+        foreach (var egg in InventoryManager.Instance.GetAllEggs())
+        {
+            if (grouped.ContainsKey(egg))
+                grouped[egg]++;
+            else
+                grouped[egg] = 1;
         }
 
         foreach (var pair in grouped)
         {
-            EggData egg = pair.Key;
-            int count = pair.Value;
+            var egg = pair.Key;
+            var count = pair.Value;
 
-            GameObject btn = Instantiate(eggButtonPrefab, eggGrid);
-
+            var btn = Instantiate(eggButtonPrefab, eggGrid);
             var text = btn.GetComponentInChildren<TextMeshProUGUI>();
-            if (text != null) text.text = $"{egg.eggName} x{count}";
+            if (text != null)
+                text.text = $"{egg.eggName} x{count}";
 
             var imgs = btn.GetComponentsInChildren<Image>();
             foreach (var img in imgs)
+            {
                 if (img.gameObject.name == "Icon")
                     img.sprite = egg.eggSprite;
+            }
 
-            EggButtonUI buttonLogic = btn.GetComponent<EggButtonUI>();
-            if (buttonLogic != null)
+            if (btn.TryGetComponent<EggButtonUI>(out var buttonLogic))
             {
                 buttonLogic.SetData(egg);
             }
@@ -98,11 +103,13 @@ public class RoomEggSelector : MonoBehaviour
     {
         foreach (Transform child in eggGrid)
         {
-            var image = child.GetComponent<Image>();
-            if (image != null)
+            if (child.TryGetComponent<Image>(out var image))
+            {
                 image.color = (child.gameObject == btn) ? Color.yellow : Color.white;
+            }
         }
     }
+
 
     void UpdateAddButtonState()
     {

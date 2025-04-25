@@ -32,8 +32,8 @@ public class InventoryUI : MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        // Group eggs by type
-        Dictionary<EggData, int> eggCounts = new Dictionary<EggData, int>();
+        // Simplify 'new' expression for Dictionary initialization
+        Dictionary<EggData, int> eggCounts = new();
         foreach (EggData egg in InventoryManager.Instance.GetAllEggs())
         {
             if (eggCounts.ContainsKey(egg))
