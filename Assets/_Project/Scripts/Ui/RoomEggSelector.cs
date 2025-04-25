@@ -18,6 +18,7 @@ public class RoomEggSelector : MonoBehaviour
     private int selectedSlotIndex = -1;
     private EggData selectedEgg;
     private GameObject selectedButton;
+    private bool slotOccupiedOnOpen = false;
 
     void Awake()
     {
@@ -26,22 +27,27 @@ public class RoomEggSelector : MonoBehaviour
 
         panel.SetActive(false);
 
-        addButton.onClick.AddListener(OnAddButtonClicked);
+        addButton.onClick.AddListener(OnAddOrRemoveButtonClicked);
         cancelButton.onClick.AddListener(ClosePanel);
         addButton.interactable = false;
     }
 
     public void OpenPanelByIndex(int index)
     {
+        if (RoomManager.Instance.IsSlotReadyToHatch(index))
+        {
+            Debug.Log($"[RoomEggSelector] Slot {index} is ready to hatch — selector disabled.");
+            return;
+        }
+
         selectedSlotIndex = index;
         selectedEgg = null;
         selectedButton = null;
+        slotOccupiedOnOpen = !RoomManager.Instance.IsSlotEmpty(index);
 
         panel.SetActive(true);
         PopulateEggButtons();
-
-        var hasEgg = RoomManager.Instance.GetEquippedEgg(index) != null;
-        UpdateAddButtonLabel(hasEgg);
+        UpdateAddButtonState();
     }
 
     void PopulateEggButtons()
@@ -71,16 +77,12 @@ public class RoomEggSelector : MonoBehaviour
                 if (img.gameObject.name == "Icon")
                     img.sprite = egg.eggSprite;
 
-            // Set egg data and manually wire up OnClick
             EggButtonUI buttonLogic = btn.GetComponent<EggButtonUI>();
             if (buttonLogic != null)
             {
                 buttonLogic.SetData(egg);
-                btn.GetComponent<Button>().onClick.AddListener(buttonLogic.OnClick);
             }
         }
-
-        addButton.interactable = false;
     }
 
     public void OnEggClicked(EggData egg, GameObject buttonObject)
@@ -89,11 +91,7 @@ public class RoomEggSelector : MonoBehaviour
         selectedButton = buttonObject;
 
         HighlightButton(buttonObject);
-
-        var hasEgg = RoomManager.Instance.GetEquippedEgg(selectedSlotIndex) != null;
-        UpdateAddButtonLabel(hasEgg);
-
-        Debug.Log($"[RoomEggSelector] Selected egg: {egg.eggName}");
+        UpdateAddButtonState();
     }
 
     void HighlightButton(GameObject btn)
@@ -106,32 +104,43 @@ public class RoomEggSelector : MonoBehaviour
         }
     }
 
-    void UpdateAddButtonLabel(bool hasEgg)
+    void UpdateAddButtonState()
     {
-        addButton.interactable = selectedEgg != null;
+        var label = addButton.GetComponentInChildren<TextMeshProUGUI>();
 
-        string label = hasEgg ? "Swap" : "Add";
-        var labelText = addButton.GetComponentInChildren<TextMeshProUGUI>();
-        if (labelText != null)
+        if (selectedEgg != null)
         {
-            labelText.text = label;
+            addButton.interactable = true;
+            label.text = "Add";
+        }
+        else if (slotOccupiedOnOpen)
+        {
+            addButton.interactable = true;
+            label.text = "Remove";
+        }
+        else
+        {
+            addButton.interactable = false;
+            label.text = "Add";
         }
     }
 
-    void OnAddButtonClicked()
+    void OnAddOrRemoveButtonClicked()
     {
-        if (selectedEgg == null || selectedSlotIndex == -1) return;
+        if (selectedSlotIndex == -1) return;
 
-        var existing = RoomManager.Instance.GetEquippedEgg(selectedSlotIndex);
-        if (existing != null)
+        if (selectedEgg != null)
         {
-            InventoryManager.Instance.AddEgg(existing);
+            // Adding new egg
+            InventoryManager.Instance.RemoveEgg(selectedEgg);
+            RoomManager.Instance.SetEquippedEgg(selectedSlotIndex, selectedEgg);
         }
+        else if (slotOccupiedOnOpen)
+        {
+            // Removing existing egg
+            RoomManager.Instance.ClearSlot(selectedSlotIndex, true);
 
-        InventoryManager.Instance.RemoveEgg(selectedEgg);
-        RoomManager.Instance.SetEquippedEgg(selectedSlotIndex, selectedEgg);
-        RoomManager.Instance.UpdateSlotIcon(selectedSlotIndex, selectedEgg.eggSprite);
-        RoomManager.Instance.StartHatchTimer(selectedSlotIndex);
+        }
 
         ClosePanel();
     }
@@ -142,5 +151,6 @@ public class RoomEggSelector : MonoBehaviour
         selectedSlotIndex = -1;
         selectedEgg = null;
         selectedButton = null;
+        slotOccupiedOnOpen = false;
     }
 }

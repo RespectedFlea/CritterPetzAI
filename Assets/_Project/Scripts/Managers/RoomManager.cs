@@ -10,13 +10,14 @@ public class RoomManager : MonoBehaviour
     [Header("UI Slot Assignments")]
     public EggData[] equippedEggs = new EggData[3];
     public Image[] eggSlotIcons;
-    public TextMeshProUGUI[] hatchTimerTexts;
 
     [Header("Hatch Settings")]
     public float hatchDuration = 30f;
     private float[] hatchTimers = new float[3];
     private bool[] isHatching = new bool[3];
-    private bool[] readyToHatch = new bool[3];
+    private bool[] isReadyToHatch = new bool[3];
+
+    public Sprite defaultEmptySlotSprite;
 
     void Awake()
     {
@@ -32,7 +33,7 @@ public class RoomManager : MonoBehaviour
 
     void Update()
     {
-        for (int i = 0; i < hatchTimers.Length; i++)
+        for (int i = 0; i < equippedEggs.Length; i++)
         {
             if (isHatching[i])
             {
@@ -40,88 +41,102 @@ public class RoomManager : MonoBehaviour
 
                 if (hatchTimers[i] <= 0)
                 {
-                    hatchTimers[i] = 0;
                     isHatching[i] = false;
-                    readyToHatch[i] = true;
-
+                    isReadyToHatch[i] = true;
                     Debug.Log($"🐣 Egg in slot {i} is ready to hatch!");
 
-                    if (hatchTimerTexts[i] != null)
-                        hatchTimerTexts[i].text = "Hatch!";
+                    var label = eggSlotIcons[i].GetComponentInChildren<TextMeshProUGUI>();
+                    if (label != null) label.text = "Hatch!";
                 }
                 else
                 {
-                    if (hatchTimerTexts[i] != null)
-                        hatchTimerTexts[i].text = $"{Mathf.CeilToInt(hatchTimers[i])}s";
-                }
-            }
-            else
-            {
-                if (!readyToHatch[i])
-                {
-                    if (hatchTimerTexts[i] != null && hatchTimerTexts[i].text != "Hatch!")
-                        hatchTimerTexts[i].text = "";
+                    var label = eggSlotIcons[i].GetComponentInChildren<TextMeshProUGUI>();
+                    if (label != null)
+                        label.text = $"{Mathf.CeilToInt(hatchTimers[i])}s";
                 }
             }
         }
-    }
-
-    public EggData GetEquippedEgg(int index)
-    {
-        if (index < 0 || index >= equippedEggs.Length) return null;
-        return equippedEggs[index];
     }
 
     public void SetEquippedEgg(int index, EggData egg)
     {
         if (index < 0 || index >= equippedEggs.Length) return;
-        equippedEggs[index] = egg;
-    }
 
-    public void UpdateSlotIcon(int index, Sprite icon)
-    {
-        if (index < 0 || index >= eggSlotIcons.Length) return;
-
-        eggSlotIcons[index].sprite = icon;
-        eggSlotIcons[index].color = Color.white; // Show icon
-    }
-
-    public void StartHatchTimer(int index)
-    {
-        if (index < 0 || index >= hatchTimers.Length) return;
-
-        hatchTimers[index] = hatchDuration;
-        isHatching[index] = true;
-        readyToHatch[index] = false;
-
-        if (hatchTimerTexts[index] != null)
-            hatchTimerTexts[index].text = $"{Mathf.CeilToInt(hatchDuration)}s";
-    }
-
-    public void AttemptHatch(int index)
-    {
-        if (index < 0 || index >= readyToHatch.Length) return;
-
-        if (readyToHatch[index])
+        // If swapping, return the old egg first
+        if (equippedEggs[index] != null)
         {
-            Debug.Log($"🌟 Starting hatch animation for slot {index}");
+            InventoryManager.Instance.AddEgg(equippedEggs[index]);
+        }
 
-            readyToHatch[index] = false;
+        equippedEggs[index] = egg;
 
-            // TODO: Play hatch animation here!
+        if (egg != null)
+        {
+            eggSlotIcons[index].sprite = egg.eggSprite;
+            eggSlotIcons[index].color = Color.white;
 
-            // After animation, spawn the infant pet
-            SpawnInfantAnimal(index);
+            var label = eggSlotIcons[index].GetComponentInChildren<TextMeshProUGUI>();
+            if (label != null)
+                label.text = $"{Mathf.CeilToInt(hatchDuration)}s";
+
+            StartHatchTimer(index);
         }
         else
         {
-            Debug.Log($"Slot {index} not ready to hatch yet.");
+            ClearSlot(index, true);
         }
     }
 
-    private void SpawnInfantAnimal(int index)
+
+    void StartHatchTimer(int index)
     {
-        Debug.Log($"🐾 Infant animal spawned in slot {index}!");
-        // TODO: Actually instantiate a pet prefab here
+        hatchTimers[index] = hatchDuration;
+        isHatching[index] = true;
+        isReadyToHatch[index] = false;
+    }
+
+    public void TryHatch(int index)
+    {
+        if (!isReadyToHatch[index]) return;
+
+        Debug.Log($"[RoomManager] Slot {index} hatched and egg destroyed.");
+        ClearSlot(index, false); // ❌ Do not return hatched eggs to inventory
+    }
+
+    public void ClearSlot(int index, bool returnToInventory)
+    {
+        if (index < 0 || index >= equippedEggs.Length) return;
+
+        if (returnToInventory && equippedEggs[index] != null)
+        {
+            InventoryManager.Instance.AddEgg(equippedEggs[index]);
+        }
+
+        equippedEggs[index] = null;
+        isHatching[index] = false;
+        isReadyToHatch[index] = false;
+        hatchTimers[index] = 0;
+
+        eggSlotIcons[index].sprite = defaultEmptySlotSprite;
+        eggSlotIcons[index].color = Color.white;
+
+        var label = eggSlotIcons[index].GetComponentInChildren<TextMeshProUGUI>();
+        if (label != null)
+            label.text = "Empty";
+    }
+
+    public bool IsSlotEmpty(int index)
+    {
+        return equippedEggs[index] == null;
+    }
+
+    public bool IsSlotReadyToHatch(int index)
+    {
+        return isReadyToHatch[index];
+    }
+
+    public bool IsSlotBusy(int index)
+    {
+        return equippedEggs[index] != null && !isReadyToHatch[index];
     }
 }
