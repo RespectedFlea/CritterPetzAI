@@ -15,3 +15,17 @@ MonoBehaviour:
   eggName: Dog Egg
   eggSprite: {fileID: 6913012632153620298, guid: 4931ee3f7ba5e6743935cf3efc960b1f, type: 3}
   hatchDuration: 15
+  gravityScale: 1.2
+  drag: 0.1
+  angularDrag: 0.08
+  bounciness: 0.2
+  squashFactor: 0.95
+  stretchFactor: 0.95
+  boingSpeed: 0.1
+  minImpactSpeedForBoing: 1
+  maxImpactSpeed: 10
+  maxSquashMultiplier: 1.2
+  wiggleRotationAmount: 5
+  wiggleDuration: 0.5
+  wiggleInterval: 5
+  wiggleRelativeToCurrentRotation: 1

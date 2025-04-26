@@ -15,3 +15,17 @@ MonoBehaviour:
   eggName: Cat Egg
   eggSprite: {fileID: 6106100700041757347, guid: 4931ee3f7ba5e6743935cf3efc960b1f, type: 3}
   hatchDuration: 10
+  gravityScale: 1
+  drag: 0
+  angularDrag: 0.05
+  bounciness: 0.4
+  squashFactor: 0.95
+  stretchFactor: 0.95
+  boingSpeed: 0.1
+  minImpactSpeedForBoing: 1
+  maxImpactSpeed: 10
+  maxSquashMultiplier: 1.2
+  wiggleRotationAmount: 5
+  wiggleDuration: 0.3
+  wiggleInterval: 5
+  wiggleRelativeToCurrentRotation: 1
