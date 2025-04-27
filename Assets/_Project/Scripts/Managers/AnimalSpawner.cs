@@ -10,12 +10,6 @@ public class AnimalSpawner : MonoBehaviour
     public AnimalData dogProfile;  // (Optional) Assign DogProfile.asset
     public AnimalData dragonProfile; // (Optional) etc.
 
-    private void Start()
-    {
-        // Example: spawn a Cat at (0,0)
-        SpawnAnimal(catProfile, new Vector2(0, 0));
-    }
-
     public void SpawnAnimal(AnimalData animalDataProfile, Vector2 spawnPosition)
     {
         GameObject newAnimal = Instantiate(animalPrefab, spawnPosition, Quaternion.identity);

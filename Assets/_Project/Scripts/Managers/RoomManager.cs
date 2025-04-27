@@ -24,7 +24,7 @@ public class RoomManager : MonoBehaviour
 
     public Sprite defaultEmptySlotSprite;
 
-    void Awake()
+    private void Awake()
     {
         if (Instance != null && Instance != this)
         {
@@ -36,7 +36,7 @@ public class RoomManager : MonoBehaviour
         DontDestroyOnLoad(this.gameObject);
     }
 
-    void Update()
+    private void Update()
     {
         for (int i = 0; i < equippedEggs.Length; i++)
         {
@@ -52,12 +52,12 @@ public class RoomManager : MonoBehaviour
 
                     var label = eggSlotIcons[i].GetComponentInChildren<TextMeshProUGUI>();
                     if (label != null) label.text = "Hatch!";
+
                     var eggObj = spawnedEggs[i];
                     if (eggObj != null && eggObj.TryGetComponent<EggComponent>(out var eggComp))
                     {
                         eggComp.StartHatchWiggle();
                     }
-
                 }
                 else
                 {
@@ -107,6 +107,7 @@ public class RoomManager : MonoBehaviour
                 if (eggComp != null)
                 {
                     eggComp.Initialize(egg);
+                    eggComp.slotTransform = eggSpawnPoints[index];
                 }
                 spawnedEggs[index] = newEgg;
             }
@@ -117,7 +118,7 @@ public class RoomManager : MonoBehaviour
         }
     }
 
-    void StartHatchTimer(int index, float duration)
+    private void StartHatchTimer(int index, float duration)
     {
         hatchTimers[index] = duration;
         isHatching[index] = true;
@@ -128,16 +129,17 @@ public class RoomManager : MonoBehaviour
     {
         if (!isReadyToHatch[index]) return;
 
-        Debug.Log($"[RoomManager] Slot {index} hatched and egg destroyed.");
+        Debug.Log($"[RoomManager] Slot {index} hatch pressed.");
 
-        // Destroy spawned egg if exists
         if (spawnedEggs[index] != null)
         {
-            Destroy(spawnedEggs[index]);
-            spawnedEggs[index] = null;
+            if (spawnedEggs[index].TryGetComponent<EggComponent>(out var eggComp))
+            {
+                eggComp.PlayHatchAnimation(); // Only start the hatch animation
+            }
         }
 
-        ClearSlot(index, false); // ❌ Do not return hatched eggs to inventory
+        // ❌ No ClearSlot here anymore — EggComponent handles destruction after animation
     }
 
     public void ClearSlot(int index, bool returnToInventory)
@@ -182,5 +184,24 @@ public class RoomManager : MonoBehaviour
     public bool IsSlotBusy(int index)
     {
         return equippedEggs[index] != null && !isReadyToHatch[index];
+    }
+
+    public void SpawnAnimalAtSlot(Vector3 position, EggData eggData)
+    {
+        if (eggData == null || eggData.animalData == null)
+        {
+            Debug.LogError("Missing EggData or AnimalData!");
+            return;
+        }
+
+        // Instantiate the AnimalPrefab
+        GameObject animalObj = Instantiate(GameManager.Instance.animalPrefab, position, Quaternion.identity);
+
+        // Assign Animal Data
+        AnimalComponent animalComp = animalObj.GetComponent<AnimalComponent>();
+        if (animalComp != null)
+        {
+            animalComp.SetupAnimal(eggData.animalData);
+        }
     }
 }

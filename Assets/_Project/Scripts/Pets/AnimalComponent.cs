@@ -25,7 +25,7 @@ public class AnimalComponent : MonoBehaviour
 
     private void Start()
     {
-        if (animalData != null)
+        if (animalData != null && sr != null)
         {
             sr.sprite = animalData.idleSprite;
         }
@@ -109,6 +109,17 @@ public class AnimalComponent : MonoBehaviour
                 sr.sprite = animalData.sleepSprite;
                 stateTimer = animalData.sleepDuration;
                 break;
+        }
+    }
+
+    // 🐾 NEW! SetupAnimal method
+    public void SetupAnimal(AnimalData data)
+    {
+        animalData = data;
+
+        if (sr != null && animalData != null)
+        {
+            sr.sprite = animalData.idleSprite;
         }
     }
 }

@@ -3829,7 +3829,7 @@ MonoBehaviour:
   - {fileID: 1043476158}
   - {fileID: 1880046169}
   - {fileID: 1908252404}
-  eggPrefab: {fileID: 808014396635525576, guid: 98163c2d31b3e414db951e129d9da26f, type: 3}
+  eggPrefab: {fileID: 6023761097717823404, guid: 6be9f1b848dbba74e8c33e1deb0d3eed, type: 3}
   eggSpawnPoints:
   - {fileID: 1360362866}
   - {fileID: 603743595}
@@ -3847,6 +3847,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1322e34ff9b093741974931b78b247ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  animalPrefab: {fileID: 7755685088123979954, guid: 01bebb5bd5e894b4a807cfdc2a81c33d, type: 3}
 --- !u!114 &1872441014
 MonoBehaviour:
   m_ObjectHideFlags: 0

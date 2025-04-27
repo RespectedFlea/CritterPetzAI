@@ -29,3 +29,4 @@ MonoBehaviour:
   wiggleDuration: 0.5
   wiggleInterval: 5
   wiggleRelativeToCurrentRotation: 1
+  animalData: {fileID: 11400000, guid: 1fb98cdf6e6af0f4a91d0e801435b176, type: 2}

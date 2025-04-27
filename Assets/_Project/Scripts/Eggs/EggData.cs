@@ -31,5 +31,8 @@ namespace CritterPetz
         public float wiggleInterval = 5f; // How long to wait between wiggles
         public bool wiggleRelativeToCurrentRotation = true; // If true, wiggles relative to whatever rotation the egg has
 
+        [Header("Animal That Hatches")]
+        public AnimalData animalData;
+
     }
 }

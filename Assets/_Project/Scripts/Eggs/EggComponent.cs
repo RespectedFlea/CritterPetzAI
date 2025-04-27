@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using CritterPetz;
 
 [RequireComponent(typeof(Rigidbody2D))]
@@ -6,6 +7,10 @@ public class EggComponent : MonoBehaviour
 {
     [Header("Egg Data")]
     public EggData eggData;
+
+    [Header("Hatching")]
+    public Animator animator; // assign this in prefab
+    public Transform slotTransform; // assign the slot when spawning the egg
 
     private Rigidbody2D rb;
     private SpriteRenderer sr;
@@ -19,47 +24,12 @@ public class EggComponent : MonoBehaviour
 
     private bool isSquashing = false;
     private bool isWiggling = false;
+    private bool isHatching = false;
 
     private Camera mainCamera;
     private float wrapBuffer = 0.1f;
 
     private Collider2D eggCollider;
-
-    public void Initialize(EggData data)
-    {
-        eggData = data;
-
-        sr = GetComponentInChildren<SpriteRenderer>();
-        if (sr != null && data.eggSprite != null)
-        {
-            sr.sprite = data.eggSprite;
-        }
-
-        if (sr != null)
-        {
-            visualTransform = sr.transform;
-            originalColor = sr.color;
-            originalVisualScale = visualTransform.localScale;
-        }
-
-        if (rb != null && data != null)
-        {
-            rb.gravityScale = data.gravityScale;
-            rb.linearDamping = data.drag;
-            rb.angularDamping = data.angularDrag;
-
-            Collider2D collider = GetComponent<Collider2D>();
-            if (collider != null)
-            {
-                PhysicsMaterial2D mat = new PhysicsMaterial2D("EggMaterial_" + data.eggName)
-                {
-                    bounciness = data.bounciness,
-                    friction = 0.4f
-                };
-                collider.sharedMaterial = mat;
-            }
-        }
-    }
 
     private void Awake()
     {
@@ -81,6 +51,39 @@ public class EggComponent : MonoBehaviour
         }
 
         mainCamera = Camera.main;
+    }
+
+    public void Initialize(EggData data)
+    {
+        eggData = data;
+
+        if (sr != null && data.eggSprite != null)
+        {
+            sr.sprite = data.eggSprite;
+        }
+
+        if (animator != null)
+        {
+            animator.ResetTrigger("Hatch"); // Clear any leftover triggers
+        }
+
+        if (rb != null && data != null)
+        {
+            rb.gravityScale = data.gravityScale;
+            rb.linearDamping = data.drag;
+            rb.angularDamping = data.angularDrag;
+
+            Collider2D collider = GetComponent<Collider2D>();
+            if (collider != null)
+            {
+                PhysicsMaterial2D mat = new PhysicsMaterial2D("EggMaterial_" + data.eggName)
+                {
+                    bounciness = data.bounciness,
+                    friction = 0.4f
+                };
+                collider.sharedMaterial = mat;
+            }
+        }
     }
 
     private void Update()
@@ -144,6 +147,8 @@ public class EggComponent : MonoBehaviour
 
     private void OnMouseDown()
     {
+        if (isHatching) return; // No interactions while hatching
+
         if (rb != null)
         {
             rb.gravityScale = 0f;
@@ -190,7 +195,7 @@ public class EggComponent : MonoBehaviour
         }
     }
 
-    private System.Collections.IEnumerator DoSquash(float impactSpeed)
+    private IEnumerator DoSquash(float impactSpeed)
     {
         isSquashing = true;
 
@@ -212,16 +217,11 @@ public class EggComponent : MonoBehaviour
         isSquashing = false;
     }
 
-    public void StartHatchWiggle()
-    {
-        if (!isWiggling)
-        {
-            isWiggling = true;
-            StartCoroutine(WiggleRoutine());
-        }
-    }
+    // ==========================
+    // Hatch Sequence
+    // ==========================
 
-    private System.Collections.IEnumerator WiggleRoutine()
+    private IEnumerator WiggleRoutine()
     {
         while (isWiggling)
         {
@@ -254,8 +254,65 @@ public class EggComponent : MonoBehaviour
         }
     }
 
+
+    public void StartHatchWiggle()
+    {
+        if (!isWiggling)
+        {
+            isWiggling = true;
+            StartCoroutine(WiggleRoutine());
+        }
+    }
+
     public void StopHatchWiggle()
     {
         isWiggling = false;
+    }
+
+    public void PlayHatchAnimation()
+    {
+        if (isHatching) return;
+        isHatching = true;
+
+        StopHatchWiggle();
+
+        // Disable player input
+        isDragging = false;
+        if (rb != null)
+        {
+            rb.bodyType = RigidbodyType2D.Kinematic; // Updated to use bodyType instead of isKinematic
+            rb.linearVelocity = Vector2.zero;
+            rb.angularVelocity = 0f;
+        }
+        if (eggCollider != null)
+        {
+            eggCollider.enabled = false;
+        }
+
+        // Stand egg upright
+        if (visualTransform != null)
+        {
+            LeanTween.rotateZ(visualTransform.gameObject, 0f, 0.5f).setEase(LeanTweenType.easeOutSine);
+        }
+
+        // Play hatch animation
+        if (animator != null)
+        {
+            animator.ResetTrigger("Hatch");
+            animator.SetTrigger("Hatch");
+        }
+
+        StartCoroutine(HatchSequence());
+    }
+
+    private IEnumerator HatchSequence()
+    {
+        yield return new WaitForSeconds(0.5f); // Wait for stand-up
+        yield return new WaitForSeconds(1.0f); // Wait for hatch animation to finish (adjust time)
+
+        Vector3 spawnPosition = transform.position + new Vector3(0f, 0.5f, 0f); // Slightly above egg
+        RoomManager.Instance.SpawnAnimalAtSlot(spawnPosition, eggData);
+
+        Destroy(gameObject);
     }
 }

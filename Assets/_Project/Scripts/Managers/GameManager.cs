@@ -16,4 +16,7 @@ public class GameManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(this.gameObject);
     }
+    [Header("Prefabs")]
+    public GameObject animalPrefab;
+
 }
