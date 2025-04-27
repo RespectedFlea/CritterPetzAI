@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 194a5521ce19f0e4f9913c02fbe45710, type: 3}
+  m_Name: DogProfile
+  m_EditorClassIdentifier: 
+  animalName: 
+  animalType: Dog
+  walkSpeed: 1.5
+  sleepDuration: 5
+  hungerRate: 0.1
+  curiosityLevel: 0.5
+  playfulness: 0.6
+  intelligence: 0.5
+  idleSprite: {fileID: -5217821923112411435, guid: 4c833062e801d2d4283bc18a10343bd5, type: 3}
+  walkSprite: {fileID: 4297221796832149592, guid: 4c833062e801d2d4283bc18a10343bd5, type: 3}
+  sleepSprite: {fileID: -5224443822662312004, guid: 4c833062e801d2d4283bc18a10343bd5, type: 3}

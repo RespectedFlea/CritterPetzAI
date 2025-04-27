@@ -1,32 +1,34 @@
 ﻿using UnityEngine;
 
-public class CatComponent : MonoBehaviour
+public class AnimalComponent : MonoBehaviour
 {
-    public CatData catData;
-
-    [Header("State Sprites")]
-    public Sprite idleSprite;
-    public Sprite walkSprite;
-    public Sprite sleepSprite;
-
-    [Header("Movement Settings")]
-    public float maxWalkSpeed = 2.5f; // Max horizontal movement speed
+    public AnimalData animalData; // Assign after spawn!
 
     private Rigidbody2D rb;
     private SpriteRenderer sr;
     private Camera mainCamera;
 
-    private enum CatState { Idle, Walking, Sleeping }
-    private CatState currentState = CatState.Idle;
+    private enum AnimalState { Idle, Walking, Sleeping }
+    private AnimalState currentState = AnimalState.Idle;
 
     private float stateTimer = 0f;
-    private float walkDirection = 1f; // -1 = left, 1 = right
+    private float walkDirection = 1f;
+
+    public float maxWalkSpeed = 2.5f;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         sr = GetComponentInChildren<SpriteRenderer>();
         mainCamera = Camera.main;
+    }
+
+    private void Start()
+    {
+        if (animalData != null)
+        {
+            sr.sprite = animalData.idleSprite;
+        }
     }
 
     private void Update()
@@ -45,12 +47,12 @@ public class CatComponent : MonoBehaviour
 
         switch (currentState)
         {
-            case CatState.Idle:
+            case AnimalState.Idle:
                 rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
                 break;
 
-            case CatState.Walking:
-                rb.AddForce(new Vector2(walkDirection * catData.walkSpeed * 10f, 0f));
+            case AnimalState.Walking:
+                rb.AddForce(new Vector2(walkDirection * animalData.walkSpeed * 10f, 0f));
 
                 if (mainCamera != null)
                 {
@@ -70,14 +72,13 @@ public class CatComponent : MonoBehaviour
                     }
                 }
 
-                // Clamp max horizontal speed
                 if (Mathf.Abs(rb.linearVelocity.x) > maxWalkSpeed)
                 {
                     rb.linearVelocity = new Vector2(Mathf.Sign(rb.linearVelocity.x) * maxWalkSpeed, rb.linearVelocity.y);
                 }
                 break;
 
-            case CatState.Sleeping:
+            case AnimalState.Sleeping:
                 rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
                 break;
         }
@@ -90,23 +91,23 @@ public class CatComponent : MonoBehaviour
         switch (random)
         {
             case 0:
-                currentState = CatState.Idle;
-                sr.sprite = idleSprite;
+                currentState = AnimalState.Idle;
+                sr.sprite = animalData.idleSprite;
                 stateTimer = Random.Range(2f, 4f);
                 break;
 
             case 1:
-                currentState = CatState.Walking;
-                sr.sprite = walkSprite;
+                currentState = AnimalState.Walking;
+                sr.sprite = animalData.walkSprite;
                 stateTimer = Random.Range(3f, 5f);
                 walkDirection = Random.Range(0, 2) == 0 ? -1f : 1f;
-                sr.flipX = walkDirection == -1f; // Flip sprite based on direction
+                sr.flipX = walkDirection == -1f;
                 break;
 
             case 2:
-                currentState = CatState.Sleeping;
-                sr.sprite = sleepSprite;
-                stateTimer = catData.sleepDuration;
+                currentState = AnimalState.Sleeping;
+                sr.sprite = animalData.sleepSprite;
+                stateTimer = animalData.sleepDuration;
                 break;
         }
     }
