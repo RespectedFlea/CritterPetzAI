@@ -30,3 +30,4 @@ MonoBehaviour:
   wiggleInterval: 5
   wiggleRelativeToCurrentRotation: 1
   animalData: {fileID: 11400000, guid: d374a5af693685148a7436b30ee12435, type: 2}
+  hatchAnimatorController: {fileID: 9100000, guid: b33c7b2ba687a9940885f85bff5e02d3, type: 2}

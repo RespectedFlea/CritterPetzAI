@@ -34,5 +34,9 @@ namespace CritterPetz
         [Header("Animal That Hatches")]
         public AnimalData animalData;
 
+        [Header("Animation Settings")]
+        public RuntimeAnimatorController hatchAnimatorController;
+
+
     }
 }

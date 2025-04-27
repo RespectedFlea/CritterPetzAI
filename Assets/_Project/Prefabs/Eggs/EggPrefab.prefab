@@ -50,8 +50,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   eggData: {fileID: 0}
-  animator: {fileID: 4214229878579556341}
-  slotTransform: {fileID: 2668631155391318853}
+  animator: {fileID: 0}
+  slotTransform: {fileID: 0}
 --- !u!70 &3890822236831802924
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -206,7 +206,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 6106100700041757347, guid: 4931ee3f7ba5e6743935cf3efc960b1f, type: 3}
+  m_Sprite: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -214,7 +214,7 @@ SpriteRenderer:
   m_Size: {x: 0.14, y: 0.18}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!95 &4214229878579556341
@@ -227,7 +227,7 @@ Animator:
   m_GameObject: {fileID: 6023761097717823404}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: b33c7b2ba687a9940885f85bff5e02d3, type: 2}
+  m_Controller: {fileID: 0}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0

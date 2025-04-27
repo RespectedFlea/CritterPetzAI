@@ -57,34 +57,29 @@ public class EggComponent : MonoBehaviour
     {
         eggData = data;
 
+        if (sr == null)
+            sr = GetComponentInChildren<SpriteRenderer>();
+
         if (sr != null && data.eggSprite != null)
         {
             sr.sprite = data.eggSprite;
         }
 
+        if (animator == null)
+            animator = GetComponent<Animator>();
+
         if (animator != null)
         {
-            animator.ResetTrigger("Hatch"); // Clear any leftover triggers
+            if (data.hatchAnimatorController != null)
+                animator.runtimeAnimatorController = data.hatchAnimatorController; // <-- Set the animation!
+
+            animator.Rebind();
+            animator.Update(0f);
         }
 
-        if (rb != null && data != null)
-        {
-            rb.gravityScale = data.gravityScale;
-            rb.linearDamping = data.drag;
-            rb.angularDamping = data.angularDrag;
-
-            Collider2D collider = GetComponent<Collider2D>();
-            if (collider != null)
-            {
-                PhysicsMaterial2D mat = new PhysicsMaterial2D("EggMaterial_" + data.eggName)
-                {
-                    bounciness = data.bounciness,
-                    friction = 0.4f
-                };
-                collider.sharedMaterial = mat;
-            }
-        }
+        // Set up physics like gravity/bounciness etc here as before
     }
+
 
     private void Update()
     {
@@ -313,6 +308,18 @@ public class EggComponent : MonoBehaviour
         Vector3 spawnPosition = transform.position + new Vector3(0f, 0.5f, 0f); // Slightly above egg
         RoomManager.Instance.SpawnAnimalAtSlot(spawnPosition, eggData);
 
+        // Clear the slot
+        if (RoomManager.Instance != null && slotTransform != null)
+        {
+            int slotIndex = RoomManager.Instance.GetSlotIndexFromTransform(slotTransform);
+            if (slotIndex != -1)
+            {
+                RoomManager.Instance.ClearSlot(slotIndex, false);
+            }
+        }
+
+        // Now destroy the egg object
         Destroy(gameObject);
+
     }
 }

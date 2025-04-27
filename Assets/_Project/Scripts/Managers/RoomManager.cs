@@ -204,4 +204,16 @@ public class RoomManager : MonoBehaviour
             animalComp.SetupAnimal(eggData.animalData);
         }
     }
+    public int GetSlotIndexFromTransform(Transform slot)
+    {
+        for (int i = 0; i < eggSpawnPoints.Length; i++)
+        {
+            if (eggSpawnPoints[i] == slot)
+            {
+                return i;
+            }
+        }
+        return -1; // Not found
+    }
+
 }
