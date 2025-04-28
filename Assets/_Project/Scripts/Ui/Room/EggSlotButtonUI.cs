@@ -1,17 +1,32 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using CritterPetz;
 
 public class EggSlotButtonUI : MonoBehaviour
 {
     public int slotIndex;
 
-    void Start()
+    private void Start()
     {
-        GetComponent<Button>().onClick.AddListener(OnClick);
+        var button = GetComponent<Button>();
+        if (button != null)
+        {
+            button.onClick.AddListener(OnClick);
+        }
+        else
+        {
+            Debug.LogError("[EggSlotButtonUI] No Button component found on EggSlot!");
+        }
     }
+
     void OnClick()
     {
-        // 🐾 If an Animal is living in this slot
+        if (RoomManager.Instance == null)
+        {
+            Debug.LogError("[EggSlotButton] RoomManager.Instance is NULL!");
+            return;
+        }
+
         if (RoomManager.Instance.IsAnimalLivingInSlot(slotIndex))
         {
             RoomManager.Instance.StoreAnimalFromSlot(slotIndex);
@@ -19,13 +34,33 @@ public class EggSlotButtonUI : MonoBehaviour
         }
         else if (RoomManager.Instance.IsSlotReadyToHatch(slotIndex))
         {
-            RoomManager.Instance.TryHatch(slotIndex);
+            if (!RoomManager.Instance.IsSlotMidHatching(slotIndex))
+            {
+                RoomManager.Instance.TryHatch(slotIndex);
+            }
+            else
+            {
+                Debug.Log($"[EggSlotButton] Slot {slotIndex} is mid-hatching. Ignoring click.");
+            }
+        }
+        else if (RoomManager.Instance.IsSlotMidHatching(slotIndex))
+        {
+            Debug.Log($"[EggSlotButton] Slot {slotIndex} is mid-hatching. Ignoring click.");
         }
         else
         {
-            RoomEggSelector.Instance.OpenPanelByIndex(slotIndex);
+            if (RoomEggSelector.Instance != null)
+            {
+                RoomEggSelector.Instance.OpenPanelByIndex(slotIndex);
+                Debug.Log($"[EggSlotButton] Opening EggSelector for slot {slotIndex}");
+            }
+            else
+            {
+                Debug.LogError("[EggSlotButton] RoomEggSelector.Instance is NULL!");
+            }
         }
 
         Debug.Log($"Clicked Egg Slot: {slotIndex}");
     }
+
 }

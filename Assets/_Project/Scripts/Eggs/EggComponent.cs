@@ -318,5 +318,7 @@ public class EggComponent : MonoBehaviour
         }
 
         Destroy(gameObject);
+
+        RoomManager.Instance.ClearHatchingAnimationFlag(linkedSlotIndex);
     }
 }

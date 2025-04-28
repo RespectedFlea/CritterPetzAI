@@ -24,6 +24,9 @@ public class RoomManager : MonoBehaviour
     private readonly bool[] isReadyToHatch = new bool[3];
 
     public Sprite defaultEmptySlotSprite;
+    // 🐣 New: Track if a slot is mid-hatching animation
+    private readonly bool[] isCurrentlyHatchingAnimation = new bool[3];
+
 
     private void Awake()
     {
@@ -128,7 +131,6 @@ public class RoomManager : MonoBehaviour
         isHatching[index] = true;
         isReadyToHatch[index] = false;
     }
-
     public void TryHatch(int index)
     {
         if (!isReadyToHatch[index]) return;
@@ -139,11 +141,10 @@ public class RoomManager : MonoBehaviour
         {
             if (spawnedEggs[index].TryGetComponent<EggComponent>(out var eggComp))
             {
-                eggComp.PlayHatchAnimation(); // Only start the hatch animation
+                isCurrentlyHatchingAnimation[index] = true; // 🐣 Mark slot as mid-hatching
+                eggComp.PlayHatchAnimation();
             }
         }
-
-        // ❌ No ClearSlot here anymore — EggComponent handles destruction after animation
     }
 
     public void ClearSlot(int index, bool returnToInventory)
@@ -294,4 +295,60 @@ public class RoomManager : MonoBehaviour
             Debug.Log($"Animal stored from slot {index}!");
         }
     }
+    public void SetEquippedAnimal(int index, AnimalData animal)
+    {
+        if (index < 0 || index >= equippedAnimals.Length) return;
+
+        // If swapping, return the old animal first (optional: not doing for now)
+
+        // Clear any existing egg in that slot
+        if (spawnedEggs[index] != null)
+        {
+            Destroy(spawnedEggs[index]);
+            spawnedEggs[index] = null;
+        }
+        equippedEggs[index] = null;
+
+        // Equip the animal
+        equippedAnimals[index] = animal;
+
+        // Spawn the animal prefab in the world
+        if (GameManager.Instance.animalPrefab != null && eggSpawnPoints[index] != null)
+        {
+            GameObject newAnimal = Instantiate(GameManager.Instance.animalPrefab, eggSpawnPoints[index].position, Quaternion.identity);
+            var animalComp = newAnimal.GetComponent<AnimalComponent>();
+            if (animalComp != null)
+            {
+                animalComp.SetupAnimal(animal);
+            }
+            spawnedEggs[index] = newAnimal; // Reusing spawnedEggs array to track animals too
+        }
+
+        // Update slot UI
+        if (animal != null)
+        {
+            eggSlotIcons[index].sprite = animal.idleSprite;
+            eggSlotIcons[index].color = Color.white;
+
+            var label = eggSlotIcons[index].GetComponentInChildren<TextMeshProUGUI>();
+            if (label != null)
+                label.text = "Pet"; // You could show animal name later here
+        }
+
+        // Clear hatch timers
+        isHatching[index] = false;
+        isReadyToHatch[index] = false;
+        hatchTimers[index] = 0;
+    }
+    public bool IsSlotMidHatching(int index)
+    {
+        if (index < 0 || index >= isCurrentlyHatchingAnimation.Length) return false;
+        return isCurrentlyHatchingAnimation[index];
+    }
+    public void ClearHatchingAnimationFlag(int index)
+    {
+        if (index < 0 || index >= isCurrentlyHatchingAnimation.Length) return;
+        isCurrentlyHatchingAnimation[index] = false;
+    }
+
 }
