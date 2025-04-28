@@ -15,6 +15,7 @@ MonoBehaviour:
   animalName: 
   animalType: Cat
   walkSpeed: 1.5
+  maxWalkSpeed: 2.5
   sleepDuration: 5
   hungerRate: 0.1
   curiosityLevel: 0.5
@@ -23,3 +24,8 @@ MonoBehaviour:
   idleSprite: {fileID: 21300000, guid: 83f158da9061a034ead35dbd9569cf5b, type: 3}
   walkSprite: {fileID: 21300000, guid: ea50e2eafb1153e47bae11a0fac01d38, type: 3}
   sleepSprite: {fileID: 21300000, guid: 9f98c645f826ef44bb98db270ee9134a, type: 3}
+  hoursToFullSleep: 8
+  sleepDesireThreshold: 30
+  napFillAmount: 25
+  forcedAwakeTimeMinutes: 15
+  bedSleepBonusMultiplier: 1.2
