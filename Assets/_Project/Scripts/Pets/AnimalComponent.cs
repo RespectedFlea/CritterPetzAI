@@ -139,14 +139,33 @@ public class AnimalComponent : MonoBehaviour
         if (isNapping)
         {
             StopNap();
+
+            // 🎁 Tiny reward for partial nap
+            float refillBonus = animalData.wakeUpRefillBonus; // new value we'll add to AnimalData
+            sleepNeed = Mathf.Clamp(sleepNeed + refillBonus, 0f, 100f);
+
             recentlyForcedAwake = true;
             forcedAwakeTimer = animalData.forcedAwakeTimeMinutes * 60f;
-            Debug.Log($"{animalData.animalName} was woken up by player!");
+            Debug.Log($"{animalData.animalName} was woken up by player! SleepNeed boosted by {refillBonus}%");
         }
     }
 
     private void HandleAI()
     {
+        float currentMaxSpeed = animalData.maxWalkSpeed;
+
+        // 💤 Penalty if pet is exhausted
+        if (sleepNeed <= animalData.fatigueThreshold)
+        {
+            currentMaxSpeed *= animalData.fatigueSpeedMultiplier; // slower when tired
+        }
+
+        // Clamp velocity using currentMaxSpeed now:
+        if (Mathf.Abs(rb.linearVelocity.x) > currentMaxSpeed)
+        {
+            rb.linearVelocity = new Vector2(Mathf.Sign(rb.linearVelocity.x) * currentMaxSpeed, rb.linearVelocity.y);
+        }
+
         // 🛌 Sleep always overrides random behavior
         if (isNapping)
         {

@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using CritterPetz;
@@ -32,7 +32,7 @@ public class InventoryUI : MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        // Simplify 'new' expression for Dictionary initialization
+        // 🥚 Display Eggs
         Dictionary<EggData, int> eggCounts = new();
         foreach (EggData egg in InventoryManager.Instance.GetAllEggs())
         {
@@ -42,7 +42,6 @@ public class InventoryUI : MonoBehaviour
                 eggCounts[egg] = 1;
         }
 
-        // Display each group with count
         foreach (KeyValuePair<EggData, int> pair in eggCounts)
         {
             EggData egg = pair.Key;
@@ -50,12 +49,10 @@ public class InventoryUI : MonoBehaviour
 
             GameObject newButton = Instantiate(buttonPrefab, buttonContainer);
 
-            // Update name with count
-            var text = newButton.GetComponentInChildren<TextMeshProUGUI>();
+            var text = newButton.GetComponentInChildren<TMPro.TextMeshProUGUI>();
             if (text != null)
                 text.text = $"{egg.eggName} x{count}";
 
-            // Update icon
             var images = newButton.GetComponentsInChildren<Image>();
             foreach (Image img in images)
             {
@@ -63,5 +60,35 @@ public class InventoryUI : MonoBehaviour
                     img.sprite = egg.eggSprite;
             }
         }
+
+        // 🐾 Display Animals
+        Dictionary<AnimalData, int> animalCounts = new();
+        foreach (AnimalData animal in InventoryManager.Instance.GetAllAnimals())
+        {
+            if (animalCounts.ContainsKey(animal))
+                animalCounts[animal]++;
+            else
+                animalCounts[animal] = 1;
+        }
+
+        foreach (KeyValuePair<AnimalData, int> pair in animalCounts)
+        {
+            AnimalData animal = pair.Key;
+            int count = pair.Value;
+
+            GameObject newButton = Instantiate(buttonPrefab, buttonContainer);
+
+            var text = newButton.GetComponentInChildren<TMPro.TextMeshProUGUI>();
+            if (text != null)
+                text.text = $"{animal.animalName} x{count}";
+
+            var images = newButton.GetComponentsInChildren<Image>();
+            foreach (Image img in images)
+            {
+                if (img.gameObject.name == "Icon" && animal.idleSprite != null)
+                    img.sprite = animal.idleSprite; // 🐾 Show animal icon
+            }
+        }
     }
+
 }

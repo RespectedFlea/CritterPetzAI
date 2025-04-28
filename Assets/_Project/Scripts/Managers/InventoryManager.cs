@@ -8,6 +8,9 @@ public class InventoryManager : MonoBehaviour
 
     // Simplified initialization of the list
     public List<EggData> eggInventory = new();
+    // Track stored Animals too
+    public List<AnimalData> animalInventory = new();
+
 
     void Awake()
     {
@@ -51,4 +54,33 @@ public class InventoryManager : MonoBehaviour
     {
         eggInventory.Clear();
     }
+    // Adds an Animal to inventory
+    public void AddAnimal(AnimalData animalData)
+    {
+        animalInventory.Add(animalData);
+        Debug.Log($"Added animal: {animalData.animalName}");
+    }
+
+    // Removes an Animal from inventory
+    public void RemoveAnimal(AnimalData animalData)
+    {
+        if (animalInventory.Contains(animalData))
+        {
+            animalInventory.Remove(animalData);
+            Debug.Log($"Removed animal: {animalData.animalName}");
+        }
+    }
+
+    // Get all stored Animals
+    public List<AnimalData> GetAllAnimals()
+    {
+        return animalInventory;
+    }
+
+    // Clear all stored Animals (optional for resets)
+    public void ClearAnimalInventory()
+    {
+        animalInventory.Clear();
+    }
+
 }

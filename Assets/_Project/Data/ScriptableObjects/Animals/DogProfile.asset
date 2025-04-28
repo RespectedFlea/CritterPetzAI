@@ -14,12 +14,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   animalName: 
   animalType: Dog
-  walkSpeed: 1.5
-  sleepDuration: 5
-  hungerRate: 0.1
   curiosityLevel: 0.5
   playfulness: 0.6
   intelligence: 0.5
+  walkSpeed: 1.5
+  maxWalkSpeed: 2.5
+  hungerRate: 0.1
   idleSprite: {fileID: 21300000, guid: 52e0ee78fc8cddf408361e8ad9f8ed7e, type: 3}
   walkSprite: {fileID: 21300000, guid: 9c82607ad05bb6144809b8c6f52327c7, type: 3}
   sleepSprite: {fileID: 21300000, guid: c3d27494d78cc1048b04d7ad241306e2, type: 3}
+  hoursToFullSleep: 8
+  sleepDesireThreshold: 20
+  napFillAmount: 30
+  forcedAwakeTimeMinutes: 30
+  bedSleepBonusMultiplier: 1.4
+  wakeUpRefillBonus: 5
+  fatigueThreshold: 10
+  fatigueSpeedMultiplier: 0.5

@@ -31,6 +31,8 @@ public class EggComponent : MonoBehaviour
 
     private Collider2D eggCollider;
 
+    public int linkedSlotIndex = -1;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -52,10 +54,10 @@ public class EggComponent : MonoBehaviour
 
         mainCamera = Camera.main;
     }
-
     public void Initialize(EggData data)
     {
         eggData = data;
+        eggData.spawnSlotTransform = slotTransform;
 
         if (sr == null)
             sr = GetComponentInChildren<SpriteRenderer>();
@@ -71,15 +73,18 @@ public class EggComponent : MonoBehaviour
         if (animator != null)
         {
             if (data.hatchAnimatorController != null)
-                animator.runtimeAnimatorController = data.hatchAnimatorController; // <-- Set the animation!
+                animator.runtimeAnimatorController = data.hatchAnimatorController;
 
             animator.Rebind();
             animator.Update(0f);
         }
 
-        // Set up physics like gravity/bounciness etc here as before
+        // 🧠 Critical — if AnimalData is missing, warn immediately
+        if (eggData.animalData == null)
+        {
+            Debug.LogWarning($"[EggComponent] Warning: Egg {eggData.eggName} has no AnimalData assigned!");
+        }
     }
-
 
     private void Update()
     {
@@ -299,7 +304,6 @@ public class EggComponent : MonoBehaviour
 
         StartCoroutine(HatchSequence());
     }
-
     private IEnumerator HatchSequence()
     {
         yield return new WaitForSeconds(0.5f); // Wait for stand-up
@@ -308,18 +312,11 @@ public class EggComponent : MonoBehaviour
         Vector3 spawnPosition = transform.position + new Vector3(0f, 0.5f, 0f); // Slightly above egg
         RoomManager.Instance.SpawnAnimalAtSlot(spawnPosition, eggData);
 
-        // Clear the slot
-        if (RoomManager.Instance != null && slotTransform != null)
+        if (RoomManager.Instance != null && linkedSlotIndex != -1)
         {
-            int slotIndex = RoomManager.Instance.GetSlotIndexFromTransform(slotTransform);
-            if (slotIndex != -1)
-            {
-                RoomManager.Instance.ClearSlot(slotIndex, false);
-            }
+            RoomManager.Instance.MarkSlotAsAnimal(linkedSlotIndex, eggData.animalData);
         }
 
-        // Now destroy the egg object
         Destroy(gameObject);
-
     }
 }

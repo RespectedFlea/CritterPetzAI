@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class EggSlotButtonUI : MonoBehaviour
@@ -9,10 +9,15 @@ public class EggSlotButtonUI : MonoBehaviour
     {
         GetComponent<Button>().onClick.AddListener(OnClick);
     }
-
     void OnClick()
     {
-        if (RoomManager.Instance.IsSlotReadyToHatch(slotIndex))
+        // 🐾 If an Animal is living in this slot
+        if (RoomManager.Instance.IsAnimalLivingInSlot(slotIndex))
+        {
+            RoomManager.Instance.StoreAnimalFromSlot(slotIndex);
+            Debug.Log($"Stored animal from slot {slotIndex}");
+        }
+        else if (RoomManager.Instance.IsSlotReadyToHatch(slotIndex))
         {
             RoomManager.Instance.TryHatch(slotIndex);
         }

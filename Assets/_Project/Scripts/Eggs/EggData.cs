@@ -37,6 +37,7 @@ namespace CritterPetz
         [Header("Animation Settings")]
         public RuntimeAnimatorController hatchAnimatorController;
 
-
+        [System.NonSerialized]
+        public Transform spawnSlotTransform;
     }
 }

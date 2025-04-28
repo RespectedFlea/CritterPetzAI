@@ -9,6 +9,7 @@ public class RoomManager : MonoBehaviour
 
     [Header("UI Slot Assignments")]
     public EggData[] equippedEggs = new EggData[3];
+    public AnimalData[] equippedAnimals = new AnimalData[3];
     public Image[] eggSlotIcons;
 
     [Header("World Egg Spawn Settings")]
@@ -40,6 +41,8 @@ public class RoomManager : MonoBehaviour
     {
         for (int i = 0; i < equippedEggs.Length; i++)
         {
+            Debug.Log($"[RoomManager.Update] Checking slot {i} — isHatching={isHatching[i]}, isReadyToHatch={isReadyToHatch[i]}");
+
             if (isHatching[i])
             {
                 hatchTimers[i] -= Time.deltaTime;
@@ -106,8 +109,9 @@ public class RoomManager : MonoBehaviour
                 var eggComp = newEgg.GetComponent<EggComponent>();
                 if (eggComp != null)
                 {
-                    eggComp.Initialize(egg);
-                    eggComp.slotTransform = eggSpawnPoints[index];
+                    eggComp.slotTransform = eggSpawnPoints[index]; // FIRST
+                    eggComp.linkedSlotIndex = index;               // SECOND
+                    eggComp.Initialize(egg);                       // LAST
                 }
                 spawnedEggs[index] = newEgg;
             }
@@ -190,20 +194,26 @@ public class RoomManager : MonoBehaviour
     {
         if (eggData == null || eggData.animalData == null)
         {
-            Debug.LogError("Missing EggData or AnimalData!");
+            Debug.LogError("[RoomManager] Missing EggData or AnimalData when spawning animal!");
             return;
         }
 
-        // Instantiate the AnimalPrefab
         GameObject animalObj = Instantiate(GameManager.Instance.animalPrefab, position, Quaternion.identity);
 
-        // Assign Animal Data
         AnimalComponent animalComp = animalObj.GetComponent<AnimalComponent>();
         if (animalComp != null)
         {
             animalComp.SetupAnimal(eggData.animalData);
         }
+
+        // Mark the slot
+        int slotIndex = GetSlotIndexFromTransform(eggData.spawnSlotTransform);
+        if (slotIndex != -1)
+        {
+            equippedAnimals[slotIndex] = eggData.animalData;
+        }
     }
+
     public int GetSlotIndexFromTransform(Transform slot)
     {
         for (int i = 0; i < eggSpawnPoints.Length; i++)
@@ -215,5 +225,73 @@ public class RoomManager : MonoBehaviour
         }
         return -1; // Not found
     }
+    public void MarkSlotAsAnimal(int slotIndex, AnimalData animalData)
+    {
+        if (slotIndex < 0 || slotIndex >= equippedAnimals.Length)
+        {
+            Debug.LogError($"[MarkSlotAsAnimal] Invalid slot index {slotIndex}");
+            return;
+        }
 
+        equippedAnimals[slotIndex] = animalData;
+        equippedEggs[slotIndex] = null;
+
+        isHatching[slotIndex] = false;
+        isReadyToHatch[slotIndex] = false;
+        hatchTimers[slotIndex] = 0;
+
+        if (animalData != null)
+        {
+            Debug.Log($"[MarkSlotAsAnimal] Setting slot {slotIndex} to animal {animalData.animalName}");
+
+            if (eggSlotIcons[slotIndex] != null)
+            {
+                eggSlotIcons[slotIndex].sprite = animalData.idleSprite;
+                eggSlotIcons[slotIndex].color = Color.white;
+
+                var label = eggSlotIcons[slotIndex].GetComponentInChildren<TextMeshProUGUI>();
+                if (label != null)
+                    label.text = "Pet";
+            }
+            else
+            {
+                Debug.LogError($"[MarkSlotAsAnimal] eggSlotIcons[{slotIndex}] is NULL!!");
+            }
+        }
+        else
+        {
+            Debug.LogError($"[MarkSlotAsAnimal] AnimalData is NULL at slot {slotIndex}");
+        }
+    }
+
+
+
+    public bool IsAnimalLivingInSlot(int index)
+    {
+        if (index < 0 || index >= equippedAnimals.Length) return false;
+        return equippedAnimals[index] != null;
+    }
+    public void StoreAnimalFromSlot(int index)
+    {
+        if (index < 0 || index >= equippedAnimals.Length) return;
+
+        if (equippedAnimals[index] != null)
+        {
+            // Store the animal
+            InventoryManager.Instance.AddAnimal(equippedAnimals[index]);
+
+            // Clear slot
+            equippedAnimals[index] = null;
+
+            // Update UI
+            eggSlotIcons[index].sprite = defaultEmptySlotSprite;
+            eggSlotIcons[index].color = Color.white;
+
+            var label = eggSlotIcons[index].GetComponentInChildren<TextMeshProUGUI>();
+            if (label != null)
+                label.text = "Empty";
+
+            Debug.Log($"Animal stored from slot {index}!");
+        }
+    }
 }
